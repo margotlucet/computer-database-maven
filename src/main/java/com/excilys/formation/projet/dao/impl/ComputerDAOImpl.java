@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.projet.dao.ComputerDAO;
 import com.excilys.formation.projet.dao.DAOFactory;
@@ -19,6 +20,7 @@ import com.excilys.formation.projet.om.Computer;
 import com.excilys.formation.projet.util.Constant;
 import com.excilys.formation.projet.wrapper.PageWrapper;
 
+@Repository
 public class ComputerDAOImpl implements ComputerDAO {
 	static final Logger LOGGER = LoggerFactory.getLogger(ComputerDAOImpl.class);
 

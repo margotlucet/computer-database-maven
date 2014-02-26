@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.projet.dao.CompanyDAO;
 import com.excilys.formation.projet.dao.DAOFactory;
@@ -19,42 +20,10 @@ import com.excilys.formation.projet.om.Company;
  * @author margot
  *
  */
+@Repository
 public class CompanyDAOImpl implements CompanyDAO {
 	static final Logger LOGGER = LoggerFactory.getLogger(CompanyDAOImpl.class);
-	/**
-	 * 
-	 * @param pName the name of the company
-	 * @return
-	 */
-	public static Company getCompanyByName(String pName){
-		Company company = new Company.Builder().build();
-		ResultSet rs = null ;
-		PreparedStatement stmt = null;
-		Connection cn = null;
-		try{
-			cn = DAOFactory.INSTANCE_DAO.getConnexion();
-			stmt = cn.prepareStatement("SELECT id,name FROM company WHERE name=?;");
-			stmt.setString(1,pName);
-			rs = stmt.executeQuery();
-			LOGGER.info("Query executed "+stmt);
-			while(rs.next()){
-				company.setId(rs.getLong(1));
-				company.setName(rs.getString(2));
-			}
-			LOGGER.info("Company obtained");
-		}
-		catch (SQLException e){
-			LOGGER.error("SQL exception raised while trying to get a company by name");
-			e.printStackTrace();
-		}
-		finally{
-			DAOFactory.INSTANCE_DAO.close(cn);
-			DAOFactory.INSTANCE_DAO.close(stmt);
-			DAOFactory.INSTANCE_DAO.close(rs);
-		}
-		return company;
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see com.excilys.formation.projet.dao.impl.CompanyDAO#getCompanyById(long)
 	 */

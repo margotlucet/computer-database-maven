@@ -6,6 +6,8 @@ import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.excilys.formation.projet.dao.ComputerDAO;
 import com.excilys.formation.projet.dao.DAOFactory;
@@ -15,17 +17,13 @@ import com.excilys.formation.projet.om.Log;
 import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.wrapper.PageWrapper;
 
-
+@Service
 public class ComputerServiceImpl implements ComputerService {
 	static final Logger LOGGER = LoggerFactory.getLogger(ComputerServiceImpl.class);
-
+	@Autowired
 	private ComputerDAO computerDAO;
+	@Autowired
 	private LogDAO logDAO;
-	public ComputerServiceImpl() {
-		super();
-		this.computerDAO = DAOFactory.INSTANCE_DAO.getComputerDAO();
-		this.logDAO = DAOFactory.INSTANCE_DAO.getLogDAO();
-	}
 
 
 	/* (non-Javadoc)
@@ -140,6 +138,15 @@ public class ComputerServiceImpl implements ComputerService {
 	@Override
 	public PageWrapper<Computer> getPage(int page, int nbResult, String orderBy, String orderDirection, String search) {
 		return this.computerDAO.getComputers(nbResult, (page-1)*nbResult,  orderBy, orderDirection, search);
+	}
+
+
+	public LogDAO getLogDAO() {
+		return logDAO;
+	}
+
+	public void setLogDAO(LogDAO logDAO) {
+		this.logDAO = logDAO;
 	}
 
 

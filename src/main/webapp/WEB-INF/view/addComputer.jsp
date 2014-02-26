@@ -10,9 +10,9 @@
 				<label for="name">Computer name:</label>
 				<div class="input">
 					<input type="text" name="name" value="${computer.name}"
-						data-validation="length alphanumeric"
+						data-validation="length"
 						data-validation-length="1-20"
-						data-validation-error-msg="The name has to be an alphanumeric value between 1-20 characters" />
+						data-validation-error-msg="The name has to be a value between 1-20 characters" />
 					<span class="help-inline">Required</span>
 				</div>
 			</div>

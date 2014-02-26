@@ -8,9 +8,6 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.formation.projet.dao.impl.CompanyDAOImpl;
-import com.excilys.formation.projet.dao.impl.ComputerDAOImpl;
-import com.excilys.formation.projet.dao.impl.LogDAOImpl;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 // On fait un enum pour avoir une seule instance de DAOFactor
@@ -21,9 +18,6 @@ import com.jolbox.bonecp.BoneCPConfig;
  */
 public enum DAOFactory {
 	INSTANCE_DAO;
-	private ComputerDAO computerDAO;
-	private CompanyDAO companyDAO;
-	private LogDAO logDAO;
 	private BoneCP connectionPool;
 	private ThreadLocalImpl<Connection> tl;
 	private final String URL = "jdbc:mysql://localhost:3306/computer-database-db?zeroDateTimeBehavior=convertToNull";
@@ -32,9 +26,6 @@ public enum DAOFactory {
 	private final Logger LOGGER = LoggerFactory.getLogger(DAOFactory.class);
 
 	private DAOFactory(){
-		computerDAO = new ComputerDAOImpl();
-		companyDAO = new CompanyDAOImpl();
-		logDAO = new LogDAOImpl();
 		tl = new ThreadLocalImpl<Connection>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -66,14 +57,6 @@ public enum DAOFactory {
 		return tl.get();
 	}
 
-	public ComputerDAO getComputerDAO() {
-		return computerDAO;
-	}
-
-
-	public CompanyDAO getCompanyDAO() {
-		return companyDAO;
-	}
 	public void close(ResultSet... rs){
 		for(ResultSet r : rs){
 			if(r!=null)
@@ -121,12 +104,6 @@ public enum DAOFactory {
 	}
 	public void setConnectionPool(BoneCP connectionPool) {
 		this.connectionPool = connectionPool;
-	}
-	public LogDAO getLogDAO() {
-		return logDAO;
-	}
-	public void setLogDAO(LogDAO logDAO) {
-		this.logDAO = logDAO;
 	}
 
 	public ThreadLocalImpl<Connection> getTl() {

@@ -6,6 +6,10 @@
 <section id="main">
 	<h1 id="homeTitle" style="FONT-FAMILY: 'Bitstream Vera Sans';">${pageResult.resultCount}
 		Computers found</h1>
+<c:if test="${message.valid==true}">
+	<div><strong> ${message.message}</strong></div>
+</c:if>
+
 	<div id="actions">
 		<form action="DisplayComputers" method="GET">
 			<div class="input">
@@ -27,12 +31,11 @@
 		<a class="btn success" id="add" href="AddComputer">Add Computer</a>
 	</div>
 
-
-	<div class="alert ">${message.message}</div>
-
 	<div class="pagination">
-		<h:page totalElements="${pageResult.resultCount}" actionPrefix="DisplayComputers?"
-			pageCount="${pageResult.pageCount}" resultsPerPage="${pageResult.resultsPerPage}" page="${pageResult.currPage}"
+		<h:page totalElements="${pageResult.resultCount}"
+			actionPrefix="DisplayComputers?" pageCount="${pageResult.pageCount}"
+			resultsPerPage="${pageResult.resultsPerPage}"
+			page="${pageResult.currPage}"
 			numberOfElements="${pageResult.currentResultCount}">
 		</h:page>
 	</div>
