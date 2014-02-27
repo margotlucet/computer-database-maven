@@ -1,12 +1,10 @@
 package com.excilys.formation.projet.mapper;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +17,14 @@ import com.excilys.formation.projet.wrapper.PageWrapper;
 public class ComputerDTOMapper {
 	static final Logger LOGGER = LoggerFactory.getLogger(ComputerDTOMapper.class);
 	public static ComputerDTO toComputerDTO(Computer c){
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		String introduced;
 		String discontinued;
 		if(c.getIntroduced()!=null)
-			introduced = formatter.format(c.getIntroduced());
+			introduced = c.getIntroduced().toString("dd/MM/yyy");
 		else
 			introduced = Constant.UNKNOWN;
 		if(c.getDiscontinued()!=null)
-			discontinued = formatter.format(c.getDiscontinued());
+			discontinued = c.getDiscontinued().toString("dd/MM/yyy");
 		else
 			discontinued = Constant.UNKNOWN;
 
@@ -51,7 +48,7 @@ public class ComputerDTOMapper {
 		}
 		return computers;
 	}
-	
+
 	public static PageWrapper<ComputerDTO> toComputerDTOPageWrapper(PageWrapper<Computer> pw){
 		PageWrapper<ComputerDTO> pwDTO = new PageWrapper<ComputerDTO>();
 		pwDTO.setElementList(toComputerDTOList(pw.getElementList()));
@@ -66,24 +63,17 @@ public class ComputerDTOMapper {
 	public static Computer toComputer(ComputerDTO cDTO){
 		Computer c = new Computer.Builder().id(cDTO.getId()).name(cDTO.getName())
 				.company(new Company.Builder().id(cDTO.getCompanyId()).name(cDTO.getCompanyName()).build()).build();
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date introduced = null;
-		Date discontinued = null;
+		DateTime introduced = null;
+		DateTime discontinued = null;
 		String introducedString = cDTO.getIntroduced();
 		String discontinuedString = cDTO.getDiscontinued();
+		LOGGER.debug("Introduced : "+introducedString);
+		LOGGER.debug("Discontinued: "+discontinuedString);
 		if((!introducedString.equals(""))&&(!introducedString.equals(Constant.UNKNOWN))&&(introducedString!=null)){
-			try {
-				introduced = formatter.parse(cDTO.getIntroduced());
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
+			introduced = DateTime.parse(cDTO.getIntroduced(),DateTimeFormat.forPattern("DD/MM/yyyy"));
 		}
 		if((!discontinuedString.equals(""))&&(!discontinuedString.equals(Constant.UNKNOWN))&&(discontinuedString!=null)){
-			try {
-				discontinued = formatter.parse(cDTO.getDiscontinued());
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
+			discontinued = DateTime.parse(cDTO.getDiscontinued(),DateTimeFormat.forPattern("DD/MM/yyyy"));
 		}
 		c.setIntroduced(introduced);
 		c.setDiscontinued(discontinued);

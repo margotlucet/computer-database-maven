@@ -1,6 +1,10 @@
 package com.excilys.formation.projet.dto;
 
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.excilys.formation.projet.util.Constant;
+
 
 /**
  * Data Trasfert Object of Computer
@@ -10,8 +14,11 @@ import com.excilys.formation.projet.util.Constant;
  */
 public class ComputerDTO {
 	private long id;
+	@NotEmpty
 	private String name;
+	@DateTimeFormat(pattern="dd/MM/yyyy")
 	private String introduced;
+	@DateTimeFormat(pattern="dd/MM/yyyy")
 	private String discontinued;
 	private long companyId;
 	private String companyName;

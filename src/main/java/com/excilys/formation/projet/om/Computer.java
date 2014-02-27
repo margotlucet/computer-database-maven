@@ -1,7 +1,10 @@
 package com.excilys.formation.projet.om;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.DateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.excilys.formation.projet.util.Constant;
 /**
@@ -13,12 +16,17 @@ public class Computer implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private long id;
+	@NotEmpty
 	private String name;
-	private Date introduced;
-	private Date discontinued;
+	@DateTimeFormat(pattern="dd/MM/yyyy")
+	private DateTime introduced;
+	@DateTimeFormat(pattern="dd/MM/yyyy")
+	private DateTime discontinued;
 	private Company company;
 
+	public Computer(){
 
+	}
 
 	/**
 	 * Builder constructor of computer
@@ -31,7 +39,7 @@ public class Computer implements Serializable{
 		this.setDiscontinued(b.getDiscontinued());
 		this.setCompany(b.getCompany());
 	}
-	
+
 	public long getId() {
 		return id;
 	}
@@ -44,16 +52,16 @@ public class Computer implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Date getIntroduced() {
+	public DateTime getIntroduced() {
 		return introduced;
 	}
-	public void setIntroduced(Date introduced) {
+	public void setIntroduced(DateTime introduced) {
 		this.introduced = introduced;
 	}
-	public Date getDiscontinued() {
+	public DateTime getDiscontinued() {
 		return discontinued;
 	}
-	public void setDiscontinued(Date discontinued) {
+	public void setDiscontinued(DateTime discontinued) {
 		this.discontinued = discontinued;
 	}
 	public Company getCompany() {
@@ -76,15 +84,15 @@ public class Computer implements Serializable{
 	public static class Builder{
 		private long id;
 		private String name;
-		private Date introduced;
-		private Date discontinued;
+		private DateTime introduced;
+		private DateTime discontinued;
 		private Company company;
-		
+
 		public Builder(){
 			this.setId(0);
 			this.setName(Constant.UNKNOWN);
 		}
-		
+
 		public Builder id(long id){
 			this.setId(id);
 			return this;
@@ -93,11 +101,11 @@ public class Computer implements Serializable{
 			this.setName(name);
 			return this;
 		}
-		public Builder introduced(Date introduced){
+		public Builder introduced(DateTime introduced){
 			this.setIntroduced(introduced);
 			return this;
 		}
-		public Builder discontinued(Date discontinued){
+		public Builder discontinued(DateTime discontinued){
 			this.setDiscontinued(discontinued);
 			return this;
 		}
@@ -105,7 +113,7 @@ public class Computer implements Serializable{
 			this.setCompany(company);
 			return this;
 		}
-		
+
 		public Computer build(){
 			return new Computer(this);
 		}
@@ -126,19 +134,19 @@ public class Computer implements Serializable{
 			this.name = name;
 		}
 
-		public Date getIntroduced() {
+		public DateTime getIntroduced() {
 			return introduced;
 		}
 
-		public void setIntroduced(Date introduced) {
+		public void setIntroduced(DateTime introduced) {
 			this.introduced = introduced;
 		}
 
-		public Date getDiscontinued() {
+		public DateTime getDiscontinued() {
 			return discontinued;
 		}
 
-		public void setDiscontinued(Date discontinued) {
+		public void setDiscontinued(DateTime discontinued) {
 			this.discontinued = discontinued;
 		}
 
@@ -149,7 +157,7 @@ public class Computer implements Serializable{
 		public void setCompany(Company company) {
 			this.company = company;
 		}
-		
+
 	}
 
 

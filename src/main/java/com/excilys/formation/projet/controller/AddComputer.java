@@ -3,22 +3,25 @@ package com.excilys.formation.projet.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.excilys.formation.projet.dto.ComputerDTO;
-import com.excilys.formation.projet.mapper.ComputerDTOMapper;
 import com.excilys.formation.projet.om.Company;
+import com.excilys.formation.projet.om.Computer;
 import com.excilys.formation.projet.service.CompanyService;
 import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.validation.ValidationMessage;
-import com.excilys.formation.projet.validation.Validator;
+
 
 @Controller
 @RequestMapping("/AddComputer")
@@ -27,10 +30,15 @@ public class AddComputer {
 
 	@Autowired
 	private ComputerService computerService;
-	
+
 	@Autowired
 	private CompanyService companyService;
 	
+	@ModelAttribute("computer")
+	public Computer getLoginForm(HttpServletRequest request) {
+		return new Computer();
+	}
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request){
 		List<Company> listResult = companyService.getListeCompany();
@@ -38,20 +46,19 @@ public class AddComputer {
 		return "addComputer";
 	}
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(HttpServletRequest request, RedirectAttributes redirectAttributes){
-		ComputerDTO cDTO = new ComputerDTO.Builder().name(request.getParameter("name")).introduced(request.getParameter("introducedDate"))
-				.discontinued(request.getParameter("discontinuedDate")).companyId(Long.parseLong(request.getParameter("company"))).build();
-		ValidationMessage validation = Validator.validateComputerDTO(cDTO); 
-		if(validation.isValid()){
-			validation.setMessage("Computer successfully added");
-			computerService.add(ComputerDTOMapper.toComputer(cDTO));
-			redirectAttributes.addFlashAttribute("message",validation);
-			return "redirect:DisplayComputers";
+	public String post(@ModelAttribute("computer") @Valid Computer computer, 
+			BindingResult result,RedirectAttributes redirectAttributes, ModelMap model){
+		if(result.hasErrors()){
+			model.addAttribute("computer", computer);
+			return "addComputer";
 		}
 		else{
-			request.setAttribute("message",validation);
-			request.setAttribute("computer",cDTO);
-			return "addComputer";
+			ValidationMessage validation = new ValidationMessage.Builder().build();
+			validation.setValid(true);
+			validation.setMessage("Computer successfully added");
+			computerService.add(computer);
+			redirectAttributes.addFlashAttribute("message",validation);
+			return "redirect:DisplayComputers";
 		}
 	}
 }

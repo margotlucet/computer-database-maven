@@ -2,13 +2,17 @@
 <%@ page import="java.util.*"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="h"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <section id="main">
 	<h1 id="homeTitle" style="FONT-FAMILY: 'Bitstream Vera Sans';">${pageResult.resultCount}
-		Computers found</h1>
-<c:if test="${message.valid==true}">
-	<div><strong> ${message.message}</strong></div>
-</c:if>
+		<spring:message code="label.datafound" />
+	</h1>
+	<c:if test="${message.valid==true}">
+		<div>
+			<strong> ${message.message}</strong>
+		</div>
+	</c:if>
 
 	<div id="actions">
 		<form action="DisplayComputers" method="GET">
@@ -16,7 +20,8 @@
 				<input type="search" id="searchbox" name="search" value=""
 					placeholder="Search name">
 			</div>
-			<label for="resultsPerPage">Results per page</label>
+			<label for="resultsPerPage"><spring:message
+					code="label.resultsPerPage" /></label>
 			<div class="input">
 				<select name="resultsPerPage" id="resultsPerPage">
 					<option>10</option>
@@ -25,10 +30,11 @@
 					<option>25</option>
 				</select>
 			</div>
-			<input type="submit" id="searchsubmit" value="Filter by name"
-				class="btn primary">
+			<button type="submit" id="searchsubmit" class="btn primary">
+				<spring:message code="label.buttonsearch" />
+			</button>
 		</form>
-		<a class="btn success" id="add" href="AddComputer">Add Computer</a>
+		<a class="btn success" id="add" href="AddComputer"><spring:message code="label.add"/></a>
 	</div>
 
 	<div class="pagination">
@@ -44,12 +50,12 @@
 			<tr>
 				<!-- Variable declarations for passing labels as parameters -->
 				<!-- Table header for Computer Name -->
-				<th>Computer Name</th>
-				<th>Introduced Date</th>
+				<th><spring:message code="label.table.header.computer"/></th>
+				<th><spring:message code="label.table.header.introduced"/></th>
 				<!-- Table header for Discontinued Date -->
-				<th>Discontinued Date</th>
+				<th><spring:message code="label.table.header.discontinued"/></th>
 				<!-- Table header for Company -->
-				<th>Company</th>
+				<th><spring:message code="label.table.header.company"/></th>
 			</tr>
 		</thead>
 		<tbody>

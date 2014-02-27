@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -42,11 +43,11 @@ public class ComputerDAOImpl implements ComputerDAO {
 			stmt.setString(1, c.getName());
 
 			if(c.getIntroduced()!=null)
-				stmt.setTimestamp(2, new Timestamp(c.getIntroduced().getTime()));
+				stmt.setTimestamp(2, new Timestamp(c.getIntroduced().getMillis()));
 			else 
 				stmt.setTimestamp(2, null);
 			if(c.getDiscontinued()!=null)
-				stmt.setTimestamp(3, new Timestamp(c.getDiscontinued().getTime()));
+				stmt.setTimestamp(3,new Timestamp(c.getDiscontinued().getMillis()));
 			else
 				stmt.setTimestamp(3, null);
 			idCompany = c.getCompany().getId();
@@ -84,8 +85,8 @@ public class ComputerDAOImpl implements ComputerDAO {
 		long id = 0;
 		try {
 			while(rs.next()){
-				computerCourant = new Computer.Builder().id(rs.getLong(1)).name(rs.getString(2)).introduced(rs.getTimestamp(3))
-						.discontinued(rs.getTimestamp(4)).build();
+				computerCourant = new Computer.Builder().id(rs.getLong(1)).name(rs.getString(2)).introduced(new DateTime(rs.getTimestamp(3)))
+						.discontinued(new DateTime(rs.getTimestamp(4))).build();
 				id = rs.getLong(5);
 				if(id!=0){
 					computerCourant.setCompany(new Company.Builder().id(id).name(rs.getString(6)).build());
@@ -181,11 +182,11 @@ public class ComputerDAOImpl implements ComputerDAO {
 					+ "company_id=? WHERE id=?;");
 			stmt.setString(1, c.getName());
 			if(c.getIntroduced()!=null)
-				stmt.setTimestamp(2, new Timestamp(c.getIntroduced().getTime()));
+				stmt.setTimestamp(2, new Timestamp(c.getIntroduced().getMillis()));
 			else 
 				stmt.setTimestamp(2, null);
 			if(c.getDiscontinued()!=null)
-				stmt.setTimestamp(3, new Timestamp(c.getDiscontinued().getTime()));
+				stmt.setTimestamp(3, new Timestamp(c.getDiscontinued().getMillis()));
 			else
 				stmt.setTimestamp(3, null);
 			idCompany = c.getCompany().getId();
@@ -390,25 +391,25 @@ public class ComputerDAOImpl implements ComputerDAO {
 			case Constant.COMPANY: 
 				if(orderDirection.equals(Constant.DESC))
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY company.name DESC LIMIT ? OFFSET ? ;");
 				else
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
 							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
-							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
+							+ "company ON computer.company_id = company.id WHERE computer.name LEFT LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY company.name ASC LIMIT ? OFFSET ? ;");
 				break;
 
 			case Constant.NAME:
 				if(orderDirection.equals(Constant.DESC))
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.name DESC LIMIT ? OFFSET ? ;");
 				else
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.name ASC LIMIT ? OFFSET ? ;");
 				break;
@@ -416,12 +417,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 			case Constant.INTRODUCED:
 				if(orderDirection.equals(Constant.DESC))
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.introduced DESC LIMIT ? OFFSET ? ;");
 				else
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.introduced ASC LIMIT ? OFFSET ? ;");
 				break;
@@ -429,12 +430,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 			case Constant.DISCONTINUED:
 				if(orderDirection.equals(Constant.DESC))
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.discontinued DESC LIMIT ? OFFSET ? ;");
 				else
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.discontinued ASC LIMIT ? OFFSET ? ;");
 				break;
@@ -443,12 +444,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 
 				if(orderDirection.equals(Constant.DESC))
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.name DESC LIMIT ? OFFSET ? ;");
 				else
 					stmt = cn.prepareStatement("SELECT computer.id, computer.name, computer.introduced, "
-							+ "computer.discontinued, company.id, company.name  FROM computer JOIN "
+							+ "computer.discontinued, company.id, company.name  FROM computer LEFT JOIN "
 							+ "company ON computer.company_id = company.id WHERE computer.name LIKE ? "
 							+ "OR company.name LIKE ? ORDER BY computer.name ASC LIMIT ? OFFSET ? ;");
 				break;

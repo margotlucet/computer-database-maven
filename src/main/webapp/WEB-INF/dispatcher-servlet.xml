@@ -10,14 +10,34 @@
    							  http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 	<import resource="classpath:applicationContext.xml" />
-	
+
 	<!-- Enabling RequestMapping annotations -->
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<!-- View mapping -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-		p:prefix="/WEB-INF/view/" p:suffix=".jsp" 
-		 />
+		p:prefix="/WEB-INF/view/" p:suffix=".jsp" />
 	<mvc:annotation-driven />
+
+	<mvc:interceptors>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang"></property>
+		</bean>
+	</mvc:interceptors>
+
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en" />
+	</bean>
+
+
+
 </beans>
