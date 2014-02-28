@@ -5,11 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.jolbox.bonecp.BoneCP;
-import com.jolbox.bonecp.BoneCPConfig;
 // On fait un enum pour avoir une seule instance de DAOFactor
 /**
  * Factory of DAO
@@ -18,8 +16,8 @@ import com.jolbox.bonecp.BoneCPConfig;
  */
 public enum DAOFactory {
 	INSTANCE_DAO;
-	private BoneCP connectionPool;
 	private ThreadLocalImpl<Connection> tl;
+	private BasicDataSource ds;
 	private final String URL = "jdbc:mysql://localhost:3306/computer-database-db?zeroDateTimeBehavior=convertToNull";
 	private final String USR = "jee-cdb";
 	private final String PW = "password";
@@ -27,27 +25,13 @@ public enum DAOFactory {
 
 	private DAOFactory(){
 		tl = new ThreadLocalImpl<Connection>();
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-		} catch (InstantiationException | IllegalAccessException
-				| ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		BoneCPConfig config = new BoneCPConfig();
-
-		config.setJdbcUrl(URL);
-		config.setUsername(USR);
-		config.setPassword(PW);
-
-		config.setMinConnectionsPerPartition(5);
-		config.setMaxConnectionsPerPartition(10);
-		config.setPartitionCount(1);
-		try {
-			setConnectionPool(new BoneCP(config));
-		} catch (SQLException e) {
-			LOGGER.error("[SQLEXCEPTION]");
-			e.printStackTrace();
-		}
+		LOGGER.debug("Creating DAOFactory");
+		LOGGER.debug("TL : "+tl.toString());
+		ds = new BasicDataSource();
+		ds.setDriverClassName("com.mysql.jdbc.Driver");
+		ds.setUrl(URL);
+		ds.setUsername(USR);
+		ds.setPassword(PW);
 	}
 	/**
 	 * Gets a connection to the database
@@ -57,6 +41,12 @@ public enum DAOFactory {
 		return tl.get();
 	}
 
+	public BasicDataSource getDs() {
+		return ds;
+	}
+	public void setDs(BasicDataSource ds) {
+		this.ds = ds;
+	}
 	public void close(ResultSet... rs){
 		for(ResultSet r : rs){
 			if(r!=null)
@@ -72,7 +62,8 @@ public enum DAOFactory {
 		for(Connection c : cn){
 			if(c!=null)
 				try {
-					c.close();
+					if(!c.isClosed())
+						c.close();
 					tl.remove();
 				} catch (SQLException e) {
 					LOGGER.error("Error occured while trying to close a Connection");
@@ -99,13 +90,6 @@ public enum DAOFactory {
 		}
 	}
 
-	public BoneCP getConnectionPool() {
-		return connectionPool;
-	}
-	public void setConnectionPool(BoneCP connectionPool) {
-		this.connectionPool = connectionPool;
-	}
-
 	public ThreadLocalImpl<Connection> getTl() {
 		return tl;
 	}
@@ -117,7 +101,7 @@ public enum DAOFactory {
 		Connection cn = this.getConnexion();
 		cn.setAutoCommit(false);
 	}
-	
+
 	public void endTransaction() throws SQLException{
 		Connection cn = null;
 		try {
@@ -129,7 +113,7 @@ public enum DAOFactory {
 			close(cn);
 		}
 	}
-	
+
 	public void rollback() throws SQLException{
 		Connection cn = null;
 		cn = this.tl.get();
@@ -141,7 +125,7 @@ public enum DAOFactory {
 			Connection cn = null;
 
 			try {
-				cn = connectionPool.getConnection();
+				cn = ds.getConnection();
 				this.set(cn);
 				LOGGER.info("[BONECP] returning connection");
 
