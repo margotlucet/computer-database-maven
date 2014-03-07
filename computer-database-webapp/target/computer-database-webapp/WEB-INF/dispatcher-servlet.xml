@@ -12,8 +12,6 @@
    	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<import resource="classpath:applicationContext.xml" />
-
-
 	<!-- View mapping -->
 
 	<!-- <tx:annotation-driven transaction-manager="txManager" /> -->
@@ -50,6 +48,5 @@
 		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
 		<property name="defaultLocale" value="en" />
 	</bean>
-
 
 </beans>
