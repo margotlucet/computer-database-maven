@@ -21,6 +21,8 @@ public class ComputerDTOMapper {
 	public static ComputerDTO toComputerDTO(Computer c) {
 		String introduced;
 		String discontinued;
+		String companyName = Constant.UNKNOWN;
+		long companyId = 0;
 		if (c.getIntroduced() != null)
 			introduced = c.getIntroduced().toString("dd/MM/yyy");
 		else
@@ -29,11 +31,14 @@ public class ComputerDTOMapper {
 			discontinued = c.getDiscontinued().toString("dd/MM/yyy");
 		else
 			discontinued = Constant.UNKNOWN;
+		if (c.getCompany() != null) {
+			companyId = c.getCompany().getId();
+			companyName = c.getCompany().getName();
+		}
 
 		return new ComputerDTO.Builder().id(c.getId()).name(c.getName())
-				.companyId(c.getCompany().getId())
-				.companyName(c.getCompany().getName()).introduced(introduced)
-				.discontinued(discontinued).build();
+				.companyId(companyId).companyName(companyName)
+				.introduced(introduced).discontinued(discontinued).build();
 	}
 
 	public static List<ComputerDTO> toComputerDTOList(List<Computer> computers) {

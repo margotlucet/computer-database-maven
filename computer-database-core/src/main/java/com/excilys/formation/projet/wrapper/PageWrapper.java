@@ -8,13 +8,11 @@ public class PageWrapper<T> {
 	private List<T> elementList;
 	private int currPage;
 	private int pageCount;
-	private int resultCount;
+	private long resultCount;
 	private int resultsPerPage;
 	private int currentResultCount;
 	private String orderBy = Constant.NAME;
 	private String orderDirection = Constant.ASC;
-
-
 
 	public List<T> getElementList() {
 		return elementList;
@@ -40,11 +38,11 @@ public class PageWrapper<T> {
 		this.pageCount = pageCount;
 	}
 
-	public int getResultCount() {
+	public long getResultCount() {
 		return resultCount;
 	}
 
-	public void setResultCount(int resultCount) {
+	public void setResultCount(long resultCount) {
 		this.resultCount = resultCount;
 	}
 
@@ -79,13 +77,13 @@ public class PageWrapper<T> {
 	public void setOrderDirection(String orderDirection) {
 		this.orderDirection = orderDirection;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "PageWrapper [currPage="
-				+ currPage + ", pageCount=" + pageCount + ", resultCount="
-				+ resultCount + ", resultsPerPage=" + resultsPerPage
-				+ ", currentResultCount=" + currentResultCount + "]";
+		return "PageWrapper [currPage=" + currPage + ", pageCount=" + pageCount
+				+ ", resultCount=" + resultCount + ", resultsPerPage="
+				+ resultsPerPage + ", currentResultCount=" + currentResultCount
+				+ "]";
 	}
 
 }

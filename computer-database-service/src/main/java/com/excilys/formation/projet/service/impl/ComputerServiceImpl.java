@@ -46,18 +46,16 @@ public class ComputerServiceImpl implements ComputerService {
 	@Override
 	@Transactional
 	public void add(Computer c) {
-
-		long idComputer = 0;
 		Log l = new Log();
-		idComputer = computerDAO.add(c);
-		c.setId(idComputer);
-		l.setComputer(c);
+		if (c.getCompany().getId() == 0)
+			c.setCompany(null);
+		c = computerDAO.add(c);
+		l.setComputerId(c.getId());
 		l.setDescription("New computer Id : " + c.toString());
 		LOGGER.debug("Log to add : " + l);
 		LOGGER.debug("My LogDAO : " + logDAO);
 		logDAO.add(l);
 		LOGGER.debug("Exiting add");
-
 	}
 
 	/*
@@ -71,8 +69,10 @@ public class ComputerServiceImpl implements ComputerService {
 	@Transactional
 	public void update(Computer c) {
 		Log l = new Log();
+		if (c.getCompany().getId() == 0)
+			c.setCompany(null);
 		computerDAO.update(c);
-		l.setComputer(c);
+		l.setComputerId(c.getId());
 		l.setDescription("Computer updated : " + c.toString());
 		logDAO.add(l);
 		LOGGER.debug("Exiting update");
@@ -93,7 +93,7 @@ public class ComputerServiceImpl implements ComputerService {
 		// DAOFactory.INSTANCE_DAO.startTransaction();
 		computerDAO.delete(id);
 		Computer c = new Computer.Builder().id(id).build();
-		l.setComputer(c);
+		l.setComputerId(c.getId());
 		l.setDescription("Computer with id " + id + " deleted");
 		logDAO.add(l);
 		// DAOFactory.INSTANCE_DAO.endTransaction();

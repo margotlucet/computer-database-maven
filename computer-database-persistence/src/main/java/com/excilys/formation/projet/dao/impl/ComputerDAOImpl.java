@@ -1,20 +1,17 @@
 package com.excilys.formation.projet.dao.impl;
 
-import java.sql.Timestamp;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.projet.dao.ComputerDAO;
 import com.excilys.formation.projet.dao.ConstantSQL;
-import com.excilys.formation.projet.jdbc.ComputerRowMapper;
 import com.excilys.formation.projet.om.Computer;
 import com.excilys.formation.projet.util.Constant;
 import com.excilys.formation.projet.wrapper.PageWrapper;
@@ -27,6 +24,9 @@ public class ComputerDAOImpl implements ComputerDAO {
 	@Autowired
 	private BoneCPDataSource dataSource;
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -35,37 +35,32 @@ public class ComputerDAOImpl implements ComputerDAO {
 	 * .formation.projet.om.Computer)
 	 */
 	@Override
-	public long add(Computer c) {
-		long id = 0;
-		long idCompany;
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("name", c.getName());
-		if (c.getIntroduced() != null)
-			paramMap.addValue("introduced", new Timestamp(c.getIntroduced()
-					.getMillis()));
-		else
-			paramMap.addValue("introduced", null);
-		if (c.getDiscontinued() != null)
-			paramMap.addValue("discontinued", new Timestamp(c.getDiscontinued()
-					.getMillis()));
-		else
-			paramMap.addValue("discontinued", null);
-		idCompany = c.getCompany().getId();
-		if (idCompany != 0)
-			paramMap.addValue("companyId", idCompany);
-		else
-			paramMap.addValue("companyId", null);
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		npjt.update(ConstantSQL.CREATE, paramMap, keyHolder,
-				new String[] { "id" });
-
-		id = keyHolder.getKey().longValue();
-		LOGGER.debug("Generated computer id : " + id);
-		LOGGER.info("Computer added");
-		return id;
-
+	public Computer add(Computer c) {
+		LOGGER.debug("Computer before : " + c);
+		entityManager.persist(c);
+		LOGGER.debug("Computer after : " + c);
+		return c;
+		/*
+		 * long idCompany;
+		 * 
+		 * MapSqlParameterSource paramMap = new MapSqlParameterSource();
+		 * paramMap.addValue("name", c.getName()); if (c.getIntroduced() !=
+		 * null) paramMap.addValue("introduced", new Timestamp(c.getIntroduced()
+		 * .getMillis())); else paramMap.addValue("introduced", null); if
+		 * (c.getDiscontinued() != null) paramMap.addValue("discontinued", new
+		 * Timestamp(c.getDiscontinued() .getMillis())); else
+		 * paramMap.addValue("discontinued", null); idCompany =
+		 * c.getCompany().getId(); if (idCompany != 0)
+		 * paramMap.addValue("companyId", idCompany); else
+		 * paramMap.addValue("companyId", null); NamedParameterJdbcTemplate npjt
+		 * = new NamedParameterJdbcTemplate( dataSource); KeyHolder keyHolder =
+		 * new GeneratedKeyHolder(); npjt.update(ConstantSQL.COMPUTER_CREATE,
+		 * paramMap, keyHolder, new String[] { "id" });
+		 * 
+		 * id = keyHolder.getKey().longValue();
+		 * LOGGER.debug("Generated computer id : " + id);
+		 * LOGGER.info("Computer added");
+		 */
 	}
 
 	/*
@@ -77,13 +72,7 @@ public class ComputerDAOImpl implements ComputerDAO {
 	@Override
 	public Computer getById(long id) {
 		Computer computer = null;
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("id", id);
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		computer = (Computer) npjt.queryForObject(ConstantSQL.SELECT_BY_ID,
-				paramMap, new ComputerRowMapper());
-		LOGGER.debug("Computer retrieved");
+		computer = (Computer) entityManager.find(Computer.class, id);
 		return computer;
 	}
 
@@ -95,11 +84,8 @@ public class ComputerDAOImpl implements ComputerDAO {
 	 */
 	@Override
 	public void delete(long id) {
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("id", id);
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		npjt.update(ConstantSQL.DELETE, paramMap);
+		Computer c = getById(id);
+		entityManager.remove(c);
 		LOGGER.debug("Computer deleted with id : " + id);
 	}
 
@@ -112,132 +98,91 @@ public class ComputerDAOImpl implements ComputerDAO {
 	 */
 	@Override
 	public void update(Computer c) {
-		long idCompany = 0;
-
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("name", c.getName());
-		paramMap.addValue("id", c.getId());
-		if (c.getIntroduced() != null)
-			paramMap.addValue("introduced", new Timestamp(c.getIntroduced()
-					.getMillis()));
-		else
-			paramMap.addValue("introduced", null);
-		if (c.getDiscontinued() != null)
-			paramMap.addValue("discontinued", new Timestamp(c.getDiscontinued()
-					.getMillis()));
-		else
-			paramMap.addValue("discontinued", null);
-		idCompany = c.getCompany().getId();
-		if (idCompany != 0)
-			paramMap.addValue("companyId", idCompany);
-		else
-			paramMap.addValue("companyId", null);
-
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		npjt.update(ConstantSQL.UPDATE, paramMap);
-
-		LOGGER.debug("Computer updated");
-
+		entityManager.merge(c);
 	}
 
-	public int getAmount() {
-		int number = 0;
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		number = npjt.queryForObject(ConstantSQL.AMOUNT, paramMap,
-				Integer.class);
+	public long getAmount() {
+		long number = 0;
+		number = (long) entityManager.createQuery(ConstantSQL.COMPUTER_AMOUNT)
+				.getSingleResult();
 		LOGGER.debug("Amount retrieved");
 		return number;
 	}
 
-	public int getAmount(String search) {
+	public long getAmount(String search) {
 
-		int number = 0;
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("search", "%" + search + "%");
+		long number = 0;
+		number = (long) entityManager
+				.createQuery(ConstantSQL.COMPUTER_AMOUNT_SEARCH)
+				.setParameter("search", "%" + search + "%").getSingleResult();
+
 		LOGGER.debug("---------------------SEARCH-------------------- : "
 				+ search);
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-		number = npjt.queryForObject(ConstantSQL.AMOUNT_SEARCH, paramMap,
-				Integer.class);
 		return number;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public PageWrapper<Computer> getComputers(int limit, int offset,
 			String orderBy, String orderDirection) {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
-		int resultCount = 0;
+		long resultCount = getAmount();
+		li = entityManager.createQuery(ConstantSQL.COMPUTERS)
+				.setFirstResult(offset).setMaxResults(limit).getResultList();
+		pw.setCurrPage((offset / limit) + 1);
+		pw.setResultsPerPage(limit);
+		pw.setResultCount(resultCount);
+		if (resultCount % limit != 0)
+			pw.setPageCount(((int) resultCount / limit) + 1);
+		else
+			pw.setPageCount((int) resultCount / limit);
+		pw.setElementList(li);
+		/*---------------------------------------------------------------------*/
+		/*-------------- Using order by NOT IMPLEMENTED WITH JPA --------------*/
+		/*---------------------------------------------------------------------*/
 
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("limit", limit);
-		paramMap.addValue("offset", offset);
-
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-
-		resultCount = this.getAmount();
 		switch (orderBy) {
 		case Constant.COMPANY:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_CD,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by company name desc");
 			else
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_CA,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by company name asc");
 			break;
 
 		case Constant.NAME:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_ND,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by name desc");
 			else
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_NA,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by name asc");
 			break;
 
 		case Constant.INTRODUCED:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_ID,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by introduced desc");
 			else
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_IA,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by introduced asc");
 			break;
 
 		case Constant.DISCONTINUED:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_DD,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by discontinued desc");
 			else
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_DA,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by discontinued asc");
 			break;
 
 		default:
 
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_ND,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by name desc");
 			else
-				li = (List<Computer>) npjt.query(ConstantSQL.COMPUTERS_NA,
-						paramMap, new ComputerRowMapper());
+				LOGGER.debug("Order by name asc");
 			break;
-
 		}
-		pw.setCurrPage((offset / limit) + 1);
-		pw.setResultsPerPage(limit);
-		pw.setResultCount(resultCount);
-		pw.setElementList(li);
-		pw.setCurrentResultCount(li.size());
-		if (resultCount % limit != 0)
-			pw.setPageCount((resultCount / limit) + 1);
-		else
-			pw.setPageCount(resultCount / limit);
+		/*---------------------------------------------------------------------*/
+		/*-------------------------------- END --------------------------------*/
+		/*---------------------------------------------------------------------*/
+
 		return pw;
 	}
 
@@ -246,84 +191,62 @@ public class ComputerDAOImpl implements ComputerDAO {
 			String orderBy, String orderDirection, String search) {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
-		int resultCount = 0;
+		long resultCount = getAmount(search);
+		li = entityManager.createQuery(ConstantSQL.COMPUTERS_SEARCH)
+				.setFirstResult(offset).setMaxResults(limit)
+				.setParameter("search", "%" + search + "%").getResultList();
+		pw.setCurrPage((offset / limit) + 1);
+		pw.setResultsPerPage(limit);
+		pw.setResultCount(resultCount);
+		if (resultCount % limit != 0)
+			pw.setPageCount(((int) resultCount / limit) + 1);
+		else
+			pw.setPageCount((int) resultCount / limit);
+		pw.setElementList(li);
+		/*---------------------------------------------------------------------*/
+		/*-------------- Using order by NOT IMPLEMENTED WITH JPA --------------*/
+		/*---------------------------------------------------------------------*/
 
-		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		paramMap.addValue("limit", limit);
-		paramMap.addValue("offset", offset);
-		paramMap.addValue("search", "%" + search + "%");
-
-		NamedParameterJdbcTemplate npjt = new NamedParameterJdbcTemplate(
-				dataSource);
-
-		resultCount = this.getAmount(search);
-		LOGGER.debug("Result count : " + resultCount);
 		switch (orderBy) {
 		case Constant.COMPANY:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_CD_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by company name desc");
 			else
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_CA_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by company name asc");
 			break;
 
 		case Constant.NAME:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_ND_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by name desc");
 			else
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_NA_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by name asc");
 			break;
 
 		case Constant.INTRODUCED:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_ID_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by introduced desc");
 			else
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_IA_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by introduced asc");
 			break;
 
 		case Constant.DISCONTINUED:
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_DD_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by discontinued desc");
 			else
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_DA_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by discontinued asc");
 			break;
 
 		default:
 
 			if (orderDirection.equals(Constant.DESC))
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_ND_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by name desc");
 			else
-				li = (List<Computer>) npjt.query(
-						ConstantSQL.COMPUTERS_NA_SEARCH, paramMap,
-						new ComputerRowMapper());
+				LOGGER.debug("Order by name asc");
 			break;
-
 		}
-		pw.setCurrPage((offset / limit) + 1);
-		pw.setResultsPerPage(limit);
-		pw.setResultCount(resultCount);
-		pw.setElementList(li);
-		if (resultCount % limit != 0)
-			pw.setPageCount((resultCount / limit) + 1);
-		else
-			pw.setPageCount(resultCount / limit);
+		/*---------------------------------------------------------------------*/
+		/*-------------------------------- END --------------------------------*/
+		/*---------------------------------------------------------------------*/
 
 		return pw;
 	}

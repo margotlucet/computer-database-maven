@@ -16,7 +16,7 @@ public interface ComputerDAO {
 	 *            computer to add
 	 * @return
 	 */
-	public abstract long add(Computer c);
+	public abstract Computer add(Computer c);
 
 	/**
 	 * Gets a computer in the database by its id

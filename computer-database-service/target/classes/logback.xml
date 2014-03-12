@@ -9,6 +9,7 @@
 	</appender>
 
 	<logger name="o.s" level="OFF" />
+	<logger name="o.h" level="OFF" />
 	<logger name="org.springframework" level="OFF" />
 
 	<root level="debug">

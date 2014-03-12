@@ -2,6 +2,17 @@ package com.excilys.formation.projet.om;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -16,16 +27,29 @@ import com.excilys.formation.projet.util.Constant;
  * @author excilys
  * 
  */
+
+@Entity
+@Table(name = "computer")
 public class Computer implements Serializable {
 	static final Logger LOGGER = LoggerFactory.getLogger(Computer.class);
 	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "id")
 	private long id;
 	@NotEmpty
+	@Column(name = "name")
 	private String name;
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@Column(name = "introduced")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime introduced;
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@Column(name = "discontinued")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime discontinued;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "company_id", nullable = true)
 	private Company company;
 
 	public Computer() {

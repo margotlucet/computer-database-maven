@@ -27,13 +27,22 @@
 		<servlet-name>default</servlet-name>
 		<url-pattern>*.js</url-pattern>
 	</servlet-mapping>
-	
-		<servlet-mapping>
+
+	<servlet-mapping>
 		<servlet-name>default</servlet-name>
 		<url-pattern>*.jpg</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
-
+	<!--  
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+        classpath:persistenceContext.xml
+    </param-value>
+    	</context-param>-->
+	    <error-page>
+        <location>/WEB-INF/error.jsp</location>
+    </error-page>
 </web-app>

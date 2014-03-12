@@ -16,29 +16,24 @@ public class CompanyServiceImpl implements CompanyService {
 	@Autowired
 	private CompanyDAO companyDAO;
 
-	/* (non-Javadoc)
-	 * @see com.excilys.formation.projet.service.CompanyService#getListeCompany()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.excilys.formation.projet.service.CompanyService#getListeCompany()
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public List<Company> getListeCompany(){
+	@Transactional(readOnly = true)
+	public List<Company> getListeCompany() {
 		return companyDAO.getCompanies();
 	}
+
 	public CompanyDAO getCompanyDAO() {
 		return companyDAO;
 	}
 
 	public void setCompanyDAO(CompanyDAO companyDAO) {
 		this.companyDAO = companyDAO;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.excilys.formation.projet.service.CompanyService#getCompanyNameById(long)
-	 */
-	@Override
-	@Transactional(readOnly=true)
-	public String getCompanyNameById(long id){
-		return this.companyDAO.getById(id).getName();
 	}
 
 }

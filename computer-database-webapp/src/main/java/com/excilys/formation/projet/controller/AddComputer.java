@@ -36,7 +36,6 @@ public class AddComputer {
 
 	@ModelAttribute("computer")
 	public Computer getLoginForm(HttpServletRequest request) {
-		LOGGER.debug("---------------REQUEST--------------- : " + request);
 		Computer c = new Computer();
 		LOGGER.debug("My computer : " + c);
 		return c;
