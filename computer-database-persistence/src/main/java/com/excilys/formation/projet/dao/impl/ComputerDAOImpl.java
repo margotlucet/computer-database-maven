@@ -4,6 +4,12 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.projet.dao.ComputerDAO;
-import com.excilys.formation.projet.dao.ConstantSQL;
+import com.excilys.formation.projet.om.Company;
 import com.excilys.formation.projet.om.Computer;
 import com.excilys.formation.projet.util.Constant;
 import com.excilys.formation.projet.wrapper.PageWrapper;
@@ -40,27 +46,6 @@ public class ComputerDAOImpl implements ComputerDAO {
 		entityManager.persist(c);
 		LOGGER.debug("Computer after : " + c);
 		return c;
-		/*
-		 * long idCompany;
-		 * 
-		 * MapSqlParameterSource paramMap = new MapSqlParameterSource();
-		 * paramMap.addValue("name", c.getName()); if (c.getIntroduced() !=
-		 * null) paramMap.addValue("introduced", new Timestamp(c.getIntroduced()
-		 * .getMillis())); else paramMap.addValue("introduced", null); if
-		 * (c.getDiscontinued() != null) paramMap.addValue("discontinued", new
-		 * Timestamp(c.getDiscontinued() .getMillis())); else
-		 * paramMap.addValue("discontinued", null); idCompany =
-		 * c.getCompany().getId(); if (idCompany != 0)
-		 * paramMap.addValue("companyId", idCompany); else
-		 * paramMap.addValue("companyId", null); NamedParameterJdbcTemplate npjt
-		 * = new NamedParameterJdbcTemplate( dataSource); KeyHolder keyHolder =
-		 * new GeneratedKeyHolder(); npjt.update(ConstantSQL.COMPUTER_CREATE,
-		 * paramMap, keyHolder, new String[] { "id" });
-		 * 
-		 * id = keyHolder.getKey().longValue();
-		 * LOGGER.debug("Generated computer id : " + id);
-		 * LOGGER.info("Computer added");
-		 */
 	}
 
 	/*
@@ -72,7 +57,7 @@ public class ComputerDAOImpl implements ComputerDAO {
 	@Override
 	public Computer getById(long id) {
 		Computer computer = null;
-		computer = (Computer) entityManager.find(Computer.class, id);
+		computer = entityManager.find(Computer.class, id);
 		return computer;
 	}
 
@@ -103,8 +88,11 @@ public class ComputerDAOImpl implements ComputerDAO {
 
 	public long getAmount() {
 		long number = 0;
-		number = (long) entityManager.createQuery(ConstantSQL.COMPUTER_AMOUNT)
-				.getSingleResult();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = cb.createQuery(Long.class);
+		Root<Computer> c = query.from(Computer.class);
+		query.select(cb.count(c));
+		number = (long) entityManager.createQuery(query).getSingleResult();
 		LOGGER.debug("Amount retrieved");
 		return number;
 	}
@@ -112,24 +100,73 @@ public class ComputerDAOImpl implements ComputerDAO {
 	public long getAmount(String search) {
 
 		long number = 0;
-		number = (long) entityManager
-				.createQuery(ConstantSQL.COMPUTER_AMOUNT_SEARCH)
-				.setParameter("search", "%" + search + "%").getSingleResult();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = cb.createQuery(Long.class);
+		Root<Computer> c = query.from(Computer.class);
+		Expression<String> pathName = c.get("name");
+		Join<Company, Long> company = c.join("company", JoinType.LEFT);
+		Expression<String> pathCompanyName = company.get("name");
+		query.select(cb.count(c)).where(
+				cb.or(cb.like(pathName, "%" + search + "%"),
+						cb.like(pathCompanyName, "%" + search + "%")));
+
+		number = (long) entityManager.createQuery(query).getSingleResult();
 
 		LOGGER.debug("---------------------SEARCH-------------------- : "
 				+ search);
 		return number;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public PageWrapper<Computer> getComputers(int limit, int offset,
 			String orderBy, String orderDirection) {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
 		long resultCount = getAmount();
-		li = entityManager.createQuery(ConstantSQL.COMPUTERS)
-				.setFirstResult(offset).setMaxResults(limit).getResultList();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> query = cb.createQuery(Computer.class);
+		Root<Computer> c = query.from(Computer.class);
+
+		switch (orderBy) {
+		/*---------------------------------------------------*/
+		/*------------------NOT IMPLEMENTED------------------*/
+		/*---------------------------------------------------*/
+		/*
+		 * case Constant.COMPANY: if (orderDirection.equals(Constant.DESC))
+		 * query.select(c).orderBy(cb.desc(c.get("company.name"))); else
+		 * query.select(c).orderBy(cb.asc(c.get("company.name"))); break;
+		 */
+		case Constant.NAME:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c).orderBy(cb.desc(c.get("name")));
+			else
+				query.select(c).orderBy(cb.asc(c.get("name")));
+			break;
+
+		case Constant.INTRODUCED:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c).orderBy(cb.desc(c.get("introduced")));
+			else
+				query.select(c).orderBy(cb.asc(c.get("introduced")));
+			break;
+
+		case Constant.DISCONTINUED:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c).orderBy(cb.desc(c.get("discontinued")));
+			else
+				query.select(c).orderBy(cb.asc(c.get("discontinued")));
+			break;
+
+		default:
+
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c).orderBy(cb.desc(c.get("name")));
+			else
+				query.select(c).orderBy(cb.asc(c.get("name")));
+			break;
+		}
+		li = entityManager.createQuery(query).setFirstResult(offset)
+				.setMaxResults(limit).getResultList();
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);
@@ -138,50 +175,6 @@ public class ComputerDAOImpl implements ComputerDAO {
 		else
 			pw.setPageCount((int) resultCount / limit);
 		pw.setElementList(li);
-		/*---------------------------------------------------------------------*/
-		/*-------------- Using order by NOT IMPLEMENTED WITH JPA --------------*/
-		/*---------------------------------------------------------------------*/
-
-		switch (orderBy) {
-		case Constant.COMPANY:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by company name desc");
-			else
-				LOGGER.debug("Order by company name asc");
-			break;
-
-		case Constant.NAME:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by name desc");
-			else
-				LOGGER.debug("Order by name asc");
-			break;
-
-		case Constant.INTRODUCED:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by introduced desc");
-			else
-				LOGGER.debug("Order by introduced asc");
-			break;
-
-		case Constant.DISCONTINUED:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by discontinued desc");
-			else
-				LOGGER.debug("Order by discontinued asc");
-			break;
-
-		default:
-
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by name desc");
-			else
-				LOGGER.debug("Order by name asc");
-			break;
-		}
-		/*---------------------------------------------------------------------*/
-		/*-------------------------------- END --------------------------------*/
-		/*---------------------------------------------------------------------*/
 
 		return pw;
 	}
@@ -192,9 +185,82 @@ public class ComputerDAOImpl implements ComputerDAO {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
 		long resultCount = getAmount(search);
-		li = entityManager.createQuery(ConstantSQL.COMPUTERS_SEARCH)
-				.setFirstResult(offset).setMaxResults(limit)
-				.setParameter("search", "%" + search + "%").getResultList();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> query = cb.createQuery(Computer.class);
+		Root<Computer> c = query.from(Computer.class);
+		Expression<String> pathName = c.get("name");
+		Join<Company, Computer> company = c.join("company", JoinType.LEFT);
+		Expression<String> pathCompanyName = company.get("name");
+
+		switch (orderBy) {
+		/*---------------------------------------------------*/
+		/*------------------NOT IMPLEMENTED------------------*/
+		/*---------------------------------------------------*/
+		/*
+		 * case Constant.COMPANY: if (orderDirection.equals(Constant.DESC))
+		 * query.select(c) .where(cb.like(pathName, "%" + search + "%"),
+		 * cb.like(pathCompanyName, "%" + search + "%"))
+		 * .orderBy(cb.desc(c.get("company.name"))); else query.select(c)
+		 * .where(cb.like(pathName, "%" + search + "%"),
+		 * cb.like(pathCompanyName, "%" + search + "%"))
+		 * .orderBy(cb.desc(c.get("company.name"))); break;
+		 */
+		case Constant.NAME:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.desc(c.get("name")));
+			else
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.asc(c.get("name")));
+			break;
+
+		case Constant.INTRODUCED:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.desc(c.get("introduced")));
+			else
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.asc(c.get("introduced")));
+			break;
+
+		case Constant.DISCONTINUED:
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.desc(c.get("discontinued")));
+			else
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.asc(c.get("discontinued")));
+			break;
+
+		default:
+
+			if (orderDirection.equals(Constant.DESC))
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.desc(c.get("name")));
+			else
+				query.select(c)
+						.where(cb.or(cb.like(pathName, "%" + search + "%"),
+								cb.like(pathCompanyName, "%" + search + "%")))
+						.orderBy(cb.asc(c.get("name")));
+			break;
+		}
+
+		li = entityManager.createQuery(query).setFirstResult(offset)
+				.setMaxResults(limit).getResultList();
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);
@@ -203,52 +269,6 @@ public class ComputerDAOImpl implements ComputerDAO {
 		else
 			pw.setPageCount((int) resultCount / limit);
 		pw.setElementList(li);
-		/*---------------------------------------------------------------------*/
-		/*-------------- Using order by NOT IMPLEMENTED WITH JPA --------------*/
-		/*---------------------------------------------------------------------*/
-
-		switch (orderBy) {
-		case Constant.COMPANY:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by company name desc");
-			else
-				LOGGER.debug("Order by company name asc");
-			break;
-
-		case Constant.NAME:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by name desc");
-			else
-				LOGGER.debug("Order by name asc");
-			break;
-
-		case Constant.INTRODUCED:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by introduced desc");
-			else
-				LOGGER.debug("Order by introduced asc");
-			break;
-
-		case Constant.DISCONTINUED:
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by discontinued desc");
-			else
-				LOGGER.debug("Order by discontinued asc");
-			break;
-
-		default:
-
-			if (orderDirection.equals(Constant.DESC))
-				LOGGER.debug("Order by name desc");
-			else
-				LOGGER.debug("Order by name asc");
-			break;
-		}
-		/*---------------------------------------------------------------------*/
-		/*-------------------------------- END --------------------------------*/
-		/*---------------------------------------------------------------------*/
-
 		return pw;
 	}
-
 }
