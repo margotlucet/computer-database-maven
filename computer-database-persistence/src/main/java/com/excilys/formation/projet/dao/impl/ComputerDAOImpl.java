@@ -4,31 +4,23 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.projet.dao.ComputerDAO;
-import com.excilys.formation.projet.om.Company;
 import com.excilys.formation.projet.om.Computer;
+import com.excilys.formation.projet.om.QCompany;
+import com.excilys.formation.projet.om.QComputer;
 import com.excilys.formation.projet.util.Constant;
 import com.excilys.formation.projet.wrapper.PageWrapper;
-import com.jolbox.bonecp.BoneCPDataSource;
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.jpa.impl.JPAQuery;
 
 @Repository
 public class ComputerDAOImpl implements ComputerDAO {
 	static final Logger LOGGER = LoggerFactory.getLogger(ComputerDAOImpl.class);
-
-	@Autowired
-	private BoneCPDataSource dataSource;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -88,11 +80,9 @@ public class ComputerDAOImpl implements ComputerDAO {
 
 	public long getAmount() {
 		long number = 0;
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Long> query = cb.createQuery(Long.class);
-		Root<Computer> c = query.from(Computer.class);
-		query.select(cb.count(c));
-		number = (long) entityManager.createQuery(query).getSingleResult();
+		JPAQuery query = new JPAQuery(entityManager);
+		QComputer computer = new QComputer("computer");
+		number = query.from(computer).count();
 		LOGGER.debug("Amount retrieved");
 		return number;
 	}
@@ -100,17 +90,14 @@ public class ComputerDAOImpl implements ComputerDAO {
 	public long getAmount(String search) {
 
 		long number = 0;
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Long> query = cb.createQuery(Long.class);
-		Root<Computer> c = query.from(Computer.class);
-		Expression<String> pathName = c.get("name");
-		Join<Company, Long> company = c.join("company", JoinType.LEFT);
-		Expression<String> pathCompanyName = company.get("name");
-		query.select(cb.count(c)).where(
-				cb.or(cb.like(pathName, "%" + search + "%"),
-						cb.like(pathCompanyName, "%" + search + "%")));
-
-		number = (long) entityManager.createQuery(query).getSingleResult();
+		JPAQuery query = new JPAQuery(entityManager);
+		QComputer computer = new QComputer("computer");
+		QCompany company = new QCompany("company");
+		BooleanBuilder likePredicat = new BooleanBuilder();
+		likePredicat.or(computer.name.like("%" + search + "%"));
+		likePredicat.or(company.name.like("%" + search + "%"));
+		number = query.from(computer).leftJoin(computer.company, company)
+				.where(likePredicat).count();
 
 		LOGGER.debug("---------------------SEARCH-------------------- : "
 				+ search);
@@ -120,12 +107,14 @@ public class ComputerDAOImpl implements ComputerDAO {
 	@Override
 	public PageWrapper<Computer> getComputers(int limit, int offset,
 			String orderBy, String orderDirection) {
+
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
+
+		JPAQuery query = new JPAQuery(entityManager);
+		QComputer computer = new QComputer("computer");
+
 		long resultCount = getAmount();
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Computer> query = cb.createQuery(Computer.class);
-		Root<Computer> c = query.from(Computer.class);
 
 		switch (orderBy) {
 		/*---------------------------------------------------*/
@@ -138,35 +127,41 @@ public class ComputerDAOImpl implements ComputerDAO {
 		 */
 		case Constant.NAME:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c).orderBy(cb.desc(c.get("name")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.name.desc()).list(computer);
 			else
-				query.select(c).orderBy(cb.asc(c.get("name")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.name.asc()).list(computer);
 			break;
 
 		case Constant.INTRODUCED:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c).orderBy(cb.desc(c.get("introduced")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.introduced.desc()).list(computer);
 			else
-				query.select(c).orderBy(cb.asc(c.get("introduced")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.introduced.asc()).list(computer);
 			break;
 
 		case Constant.DISCONTINUED:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c).orderBy(cb.desc(c.get("discontinued")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.discontinued.desc()).list(computer);
 			else
-				query.select(c).orderBy(cb.asc(c.get("discontinued")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.discontinued.asc()).list(computer);
 			break;
 
 		default:
 
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c).orderBy(cb.desc(c.get("name")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.name.desc()).list(computer);
 			else
-				query.select(c).orderBy(cb.asc(c.get("name")));
+				li = query.from(computer).limit(limit).offset(offset)
+						.orderBy(computer.name.asc()).list(computer);
 			break;
 		}
-		li = entityManager.createQuery(query).setFirstResult(offset)
-				.setMaxResults(limit).getResultList();
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);
@@ -185,82 +180,63 @@ public class ComputerDAOImpl implements ComputerDAO {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
 		long resultCount = getAmount(search);
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Computer> query = cb.createQuery(Computer.class);
-		Root<Computer> c = query.from(Computer.class);
-		Expression<String> pathName = c.get("name");
-		Join<Company, Computer> company = c.join("company", JoinType.LEFT);
-		Expression<String> pathCompanyName = company.get("name");
+		JPAQuery query = new JPAQuery(entityManager);
+		QComputer computer = new QComputer("computer");
+		QCompany company = new QCompany("company");
+		BooleanBuilder likePredicat = new BooleanBuilder();
+		likePredicat.or(computer.name.like("%" + search + "%"));
+		likePredicat.or(company.name.like("%" + search + "%"));
 
 		switch (orderBy) {
 		/*---------------------------------------------------*/
 		/*------------------NOT IMPLEMENTED------------------*/
 		/*---------------------------------------------------*/
-		/*
-		 * case Constant.COMPANY: if (orderDirection.equals(Constant.DESC))
-		 * query.select(c) .where(cb.like(pathName, "%" + search + "%"),
-		 * cb.like(pathCompanyName, "%" + search + "%"))
-		 * .orderBy(cb.desc(c.get("company.name"))); else query.select(c)
-		 * .where(cb.like(pathName, "%" + search + "%"),
-		 * cb.like(pathCompanyName, "%" + search + "%"))
-		 * .orderBy(cb.desc(c.get("company.name"))); break;
-		 */
+
 		case Constant.NAME:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.desc(c.get("name")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.name.desc()).list(computer);
 			else
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.asc(c.get("name")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.name.asc()).list(computer);
 			break;
 
 		case Constant.INTRODUCED:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.desc(c.get("introduced")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.introduced.desc()).list(computer);
 			else
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.asc(c.get("introduced")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.introduced.asc()).list(computer);
 			break;
 
 		case Constant.DISCONTINUED:
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.desc(c.get("discontinued")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.discontinued.desc()).list(computer);
 			else
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.asc(c.get("discontinued")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.discontinued.asc()).list(computer);
 			break;
 
 		default:
 
 			if (orderDirection.equals(Constant.DESC))
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.desc(c.get("name")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.name.desc()).list(computer);
 			else
-				query.select(c)
-						.where(cb.or(cb.like(pathName, "%" + search + "%"),
-								cb.like(pathCompanyName, "%" + search + "%")))
-						.orderBy(cb.asc(c.get("name")));
+				li = query.from(computer).leftJoin(computer.company, company)
+						.where(likePredicat).limit(limit).offset(offset)
+						.orderBy(computer.name.asc()).list(computer);
 			break;
 		}
-
-		li = entityManager.createQuery(query).setFirstResult(offset)
-				.setMaxResults(limit).getResultList();
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);

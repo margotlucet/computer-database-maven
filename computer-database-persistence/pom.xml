@@ -48,11 +48,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 
 		<!-- Logback core -->
 		<dependency>
@@ -73,6 +68,24 @@
 			<artifactId>spring-orm</artifactId>
 			<scope>compile</scope>
 		</dependency>
+            <!-- Query DSL -->
 
+            <dependency>
+                <groupId>com.mysema.querydsl</groupId>
+                <artifactId>querydsl-core</artifactId>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysema.querydsl</groupId>
+                <artifactId>querydsl-apt</artifactId>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysema.querydsl</groupId>
+                <artifactId>querydsl-jpa</artifactId>
+            </dependency>
 	</dependencies>
+	
+
 </project>

@@ -69,7 +69,6 @@ public class DisplayComputers {
 		model.addAttribute("pageResult", pageResult);
 		model.addAttribute("search", search);
 		model.addAttribute("resultsPerPage", resultsPerPage);
-
 		return "dashboard";
 	}
 }

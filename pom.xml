@@ -13,7 +13,6 @@
 		<slf4j.version>1.6.6</slf4j.version>
 		<taglibs-standard-spec.version>1.2.1</taglibs-standard-spec.version>
 		<bonecp.version>0.8.0.RELEASE</bonecp.version>
-		<mysql-connector-java.version>5.1.6</mysql-connector-java.version>
 		<jstl.version>1.2</jstl.version>
 		<javax.servlet-api.version>3.0.1</javax.servlet-api.version>
 		<jsp-api.version>2.1</jsp-api.version>
@@ -27,6 +26,7 @@
 		<hibernate-persistence.version>4.2.10.Final</hibernate-persistence.version>
 		<spring-orm.version>3.1.1.RELEASE</spring-orm.version>
 		<usertype.jodatime.version>2.0</usertype.jodatime.version>
+		<querydsl.version>3.3.1</querydsl.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -44,12 +44,6 @@
 				<version>${bonecp.version}</version>
 			</dependency>
 
-			<!-- Mysql connector -->
-			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>${mysql-connector-java.version}</version>
-			</dependency>
 
 			<!-- Servlet API -->
 			<dependency>
@@ -157,6 +151,25 @@
 				<version>${usertype.jodatime.version}</version>
 			</dependency>
 
+			<!-- Query DSL -->
+
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-core</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-apt</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
 		</dependencies>
 
 	</dependencyManagement>
