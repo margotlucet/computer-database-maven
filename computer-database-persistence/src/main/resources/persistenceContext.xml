@@ -48,4 +48,6 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
 	</bean>
 	<bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	
+	  <jpa:repositories base-package="com.excilys.formation.projet.repository"/>
 </beans>

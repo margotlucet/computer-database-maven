@@ -6,15 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.excilys.formation.projet.dao.CompanyDAO;
 import com.excilys.formation.projet.om.Company;
+import com.excilys.formation.projet.repository.CompanyRepository;
 import com.excilys.formation.projet.service.CompanyService;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
 	@Autowired
-	private CompanyDAO companyDAO;
+	private CompanyRepository companyRepository;
 
 	/*
 	 * (non-Javadoc)
@@ -25,15 +25,7 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Company> getListeCompany() {
-		return companyDAO.getCompanies();
-	}
-
-	public CompanyDAO getCompanyDAO() {
-		return companyDAO;
-	}
-
-	public void setCompanyDAO(CompanyDAO companyDAO) {
-		this.companyDAO = companyDAO;
+		return companyRepository.findAll();
 	}
 
 }

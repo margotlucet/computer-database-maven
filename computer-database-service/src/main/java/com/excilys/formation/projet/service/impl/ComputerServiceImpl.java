@@ -3,13 +3,15 @@ package com.excilys.formation.projet.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.excilys.formation.projet.dao.ComputerDAO;
-import com.excilys.formation.projet.dao.LogDAO;
 import com.excilys.formation.projet.om.Computer;
 import com.excilys.formation.projet.om.Log;
+import com.excilys.formation.projet.repository.ComputerRepository;
+import com.excilys.formation.projet.repository.LogRepository;
 import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.wrapper.PageWrapper;
 
@@ -18,9 +20,9 @@ public class ComputerServiceImpl implements ComputerService {
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(ComputerServiceImpl.class);
 	@Autowired
-	private ComputerDAO computerDAO;
+	private ComputerRepository computerRepository;
 	@Autowired
-	private LogDAO logDAO;
+	private LogRepository logRepository;
 
 	/*
 	 * (non-Javadoc)
@@ -32,8 +34,7 @@ public class ComputerServiceImpl implements ComputerService {
 	@Override
 	@Transactional(readOnly = true)
 	public Computer getById(long id) {
-		Computer c = this.computerDAO.getById(id);
-		return c;
+		return computerRepository.findOne(id);
 	}
 
 	/*
@@ -49,12 +50,11 @@ public class ComputerServiceImpl implements ComputerService {
 		Log l = new Log();
 		if (c.getCompany().getId() == 0)
 			c.setCompany(null);
-		c = computerDAO.add(c);
+		c = computerRepository.save(c);
 		l.setComputerId(c.getId());
 		l.setDescription("New computer Id : " + c.toString());
 		LOGGER.debug("Log to add : " + l);
-		LOGGER.debug("My LogDAO : " + logDAO);
-		logDAO.add(l);
+		logRepository.save(l);
 		LOGGER.debug("Exiting add");
 	}
 
@@ -71,10 +71,10 @@ public class ComputerServiceImpl implements ComputerService {
 		Log l = new Log();
 		if (c.getCompany().getId() == 0)
 			c.setCompany(null);
-		computerDAO.update(c);
+		c = computerRepository.save(c);
 		l.setComputerId(c.getId());
 		l.setDescription("Computer updated : " + c.toString());
-		logDAO.add(l);
+		logRepository.save(l);
 		LOGGER.debug("Exiting update");
 	}
 
@@ -89,15 +89,11 @@ public class ComputerServiceImpl implements ComputerService {
 	@Transactional
 	public void delete(long id) {
 		Log l = new Log();
-
-		// DAOFactory.INSTANCE_DAO.startTransaction();
-		computerDAO.delete(id);
+		computerRepository.delete(id);
 		Computer c = new Computer.Builder().id(id).build();
 		l.setComputerId(c.getId());
 		l.setDescription("Computer with id " + id + " deleted");
-		logDAO.add(l);
-		// DAOFactory.INSTANCE_DAO.endTransaction();
-
+		logRepository.save(l);
 		LOGGER.debug("Exiting delete");
 	}
 
@@ -105,32 +101,44 @@ public class ComputerServiceImpl implements ComputerService {
 	@Transactional(readOnly = true)
 	public PageWrapper<Computer> getPage(int page, int nbResult,
 			String orderBy, String orderDirection) {
-		return this.computerDAO.getComputers(nbResult, (page - 1) * nbResult,
-				orderBy, orderDirection);
+		PageWrapper<Computer> pw = new PageWrapper<Computer>();
+		pw.setCurrPage(page);
+		pw.setResultsPerPage(nbResult);
+		PageRequest pageRequest = new PageRequest(page, nbResult,
+				Sort.Direction.ASC, orderBy);
+		pw.setElementList(computerRepository.findAll(pageRequest).getContent());
+		int resultCount = (int) computerRepository.count();
+		LOGGER.debug("Result Count : " + resultCount);
+		pw.setResultCount(resultCount);
+		if (resultCount % nbResult != 0)
+			pw.setPageCount(((int) resultCount / nbResult) + 1);
+		else
+			pw.setPageCount((int) resultCount / nbResult);
+		LOGGER.debug("Page Wrapper : " + pw);
+		return pw;
+
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public PageWrapper<Computer> getPage(int page, int nbResult,
 			String orderBy, String orderDirection, String search) {
-		return this.computerDAO.getComputers(nbResult, (page - 1) * nbResult,
-				orderBy, orderDirection, search);
-	}
+		PageWrapper<Computer> pw = new PageWrapper<Computer>();
+		pw.setCurrPage(page);
+		pw.setResultsPerPage(nbResult);
+		PageRequest pageRequest = new PageRequest(page, nbResult,
+				Sort.Direction.ASC, orderBy);
+		pw.setElementList(computerRepository.findByCompanyNameLikeOrNameLike(
+				"%" + search + "%", "%" + search + "%", pageRequest));
+		int resultCount = computerRepository.countByCompanyNameLikeOrNameLike(
+				"%" + search + "%", "%" + search + "%").intValue();
+		pw.setResultCount(resultCount);
+		if (resultCount % nbResult != 0)
+			pw.setPageCount(((int) resultCount / nbResult) + 1);
+		else
+			pw.setPageCount((int) resultCount / nbResult);
+		return pw;
 
-	public ComputerDAO getComputerDAO() {
-		return computerDAO;
-	}
-
-	public void setComputerDAO(ComputerDAO computerDAO) {
-		this.computerDAO = computerDAO;
-	}
-
-	public LogDAO getLogDAO() {
-		return logDAO;
-	}
-
-	public void setLogDAO(LogDAO logDAO) {
-		this.logDAO = logDAO;
 	}
 
 }
