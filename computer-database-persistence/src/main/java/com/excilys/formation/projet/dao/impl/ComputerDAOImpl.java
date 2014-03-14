@@ -78,7 +78,7 @@ public class ComputerDAOImpl implements ComputerDAO {
 		entityManager.merge(c);
 	}
 
-	public long getAmount() {
+	private long getAmount() {
 		long number = 0;
 		JPAQuery query = new JPAQuery(entityManager);
 		QComputer computer = new QComputer("computer");
@@ -87,7 +87,7 @@ public class ComputerDAOImpl implements ComputerDAO {
 		return number;
 	}
 
-	public long getAmount(String search) {
+	private long getAmount(String search) {
 
 		long number = 0;
 		JPAQuery query = new JPAQuery(entityManager);
@@ -110,58 +110,19 @@ public class ComputerDAOImpl implements ComputerDAO {
 
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
+		long resultCount = getAmount();
 
+		// Setting JPA Query
 		JPAQuery query = new JPAQuery(entityManager);
 		QComputer computer = new QComputer("computer");
 
-		long resultCount = getAmount();
+		// Configuring the query
+		query.from(computer).limit(limit).offset(offset);
 
-		switch (orderBy) {
-		/*---------------------------------------------------*/
-		/*------------------NOT IMPLEMENTED------------------*/
-		/*---------------------------------------------------*/
-		/*
-		 * case Constant.COMPANY: if (orderDirection.equals(Constant.DESC))
-		 * query.select(c).orderBy(cb.desc(c.get("company.name"))); else
-		 * query.select(c).orderBy(cb.asc(c.get("company.name"))); break;
-		 */
-		case Constant.NAME:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.name.desc()).list(computer);
-			else
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.name.asc()).list(computer);
-			break;
+		// Getting result list ordered
+		li = getResultOrdered(query, orderBy, orderDirection, computer);
 
-		case Constant.INTRODUCED:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.introduced.desc()).list(computer);
-			else
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.introduced.asc()).list(computer);
-			break;
-
-		case Constant.DISCONTINUED:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.discontinued.desc()).list(computer);
-			else
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.discontinued.asc()).list(computer);
-			break;
-
-		default:
-
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.name.desc()).list(computer);
-			else
-				li = query.from(computer).limit(limit).offset(offset)
-						.orderBy(computer.name.asc()).list(computer);
-			break;
-		}
+		// Configuring page wrapper
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);
@@ -180,63 +141,25 @@ public class ComputerDAOImpl implements ComputerDAO {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		List<Computer> li = null;
 		long resultCount = getAmount(search);
+
+		// Setting JPA Query
 		JPAQuery query = new JPAQuery(entityManager);
 		QComputer computer = new QComputer("computer");
 		QCompany company = new QCompany("company");
+
+		// Building the "where" predicates
 		BooleanBuilder likePredicat = new BooleanBuilder();
 		likePredicat.or(computer.name.like("%" + search + "%"));
 		likePredicat.or(company.name.like("%" + search + "%"));
 
-		switch (orderBy) {
-		/*---------------------------------------------------*/
-		/*------------------NOT IMPLEMENTED------------------*/
-		/*---------------------------------------------------*/
+		// Configuring the query
+		query.from(computer).leftJoin(computer.company, company)
+				.where(likePredicat).limit(limit).offset(offset);
 
-		case Constant.NAME:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.name.desc()).list(computer);
-			else
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.name.asc()).list(computer);
-			break;
+		// Getting result list ordered
+		li = getResultOrdered(query, orderBy, orderDirection, computer);
 
-		case Constant.INTRODUCED:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.introduced.desc()).list(computer);
-			else
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.introduced.asc()).list(computer);
-			break;
-
-		case Constant.DISCONTINUED:
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.discontinued.desc()).list(computer);
-			else
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.discontinued.asc()).list(computer);
-			break;
-
-		default:
-
-			if (orderDirection.equals(Constant.DESC))
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.name.desc()).list(computer);
-			else
-				li = query.from(computer).leftJoin(computer.company, company)
-						.where(likePredicat).limit(limit).offset(offset)
-						.orderBy(computer.name.asc()).list(computer);
-			break;
-		}
+		// Configuring page wrapper
 		pw.setCurrPage((offset / limit) + 1);
 		pw.setResultsPerPage(limit);
 		pw.setResultCount(resultCount);
@@ -245,6 +168,44 @@ public class ComputerDAOImpl implements ComputerDAO {
 		else
 			pw.setPageCount((int) resultCount / limit);
 		pw.setElementList(li);
+
 		return pw;
+	}
+
+	private List<Computer> getResultOrdered(JPAQuery query, String orderBy,
+			String orderDirection, QComputer computer) {
+		List<Computer> li = null;
+		switch (orderBy) {
+		case Constant.NAME:
+			if (orderDirection.equals(Constant.DESC))
+				query.orderBy(computer.name.desc());
+			else
+				query.orderBy(computer.name.asc());
+			break;
+
+		case Constant.INTRODUCED:
+			if (orderDirection.equals(Constant.DESC))
+				query.orderBy(computer.introduced.desc());
+			else
+				query.orderBy(computer.introduced.asc());
+			break;
+
+		case Constant.DISCONTINUED:
+			if (orderDirection.equals(Constant.DESC))
+				query.orderBy(computer.discontinued.desc());
+			else
+				query.orderBy(computer.discontinued.asc());
+			break;
+
+		default:
+
+			if (orderDirection.equals(Constant.DESC))
+				query.orderBy(computer.name.desc());
+			else
+				query.orderBy(computer.name.asc());
+			break;
+		}
+		li = query.list(computer);
+		return li;
 	}
 }

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>formation</groupId>
 		<artifactId>computer-database</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>computer-database-persistence</artifactId>
 	<name>computer-database-persistence</name>
@@ -24,7 +24,12 @@
 		<dependency>
 			<groupId>formation</groupId>
 			<artifactId>computer-database-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>hibernate-core</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- ConnectionPool BoneCP -->
@@ -32,60 +37,63 @@
 			<groupId>com.jolbox</groupId>
 			<artifactId>bonecp</artifactId>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
-		<!-- Spring MVC including other spring dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<scope>compile</scope>
-		</dependency>
 
 		<!-- Spring JDBC connector -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<scope>compile</scope>
-		</dependency>
-
-
-		<!-- Logback core -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Logback classic -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 			<scope>compile</scope>
 		</dependency>
-            <!-- Query DSL -->
+		<!-- Query DSL -->
 
-            <dependency>
-                <groupId>com.mysema.querydsl</groupId>
-                <artifactId>querydsl-core</artifactId>
-            </dependency>
+		<dependency>
+			<groupId>com.mysema.querydsl</groupId>
+			<artifactId>querydsl-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-            <dependency>
-                <groupId>com.mysema.querydsl</groupId>
-                <artifactId>querydsl-apt</artifactId>
-                <scope>provided</scope>
-            </dependency>
+		<dependency>
+			<groupId>com.mysema.querydsl</groupId>
+			<artifactId>querydsl-apt</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-            <dependency>
-                <groupId>com.mysema.querydsl</groupId>
-                <artifactId>querydsl-jpa</artifactId>
-            </dependency>
+		<dependency>
+			<groupId>com.mysema.querydsl</groupId>
+			<artifactId>querydsl-jpa</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+		</dependency>
+
+
 	</dependencies>
-	
+
 
 </project>

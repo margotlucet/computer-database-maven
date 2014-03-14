@@ -12,16 +12,18 @@ import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.validation.ValidationMessage;
 
 @Controller
-@RequestMapping("/DeleteComputer")
+@RequestMapping("/deletecomputer")
 public class DeleteComputer {
 	@Autowired
 	ComputerService computerService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request, RedirectAttributes redirectAttributes){
+	public String get(HttpServletRequest request,
+			RedirectAttributes redirectAttributes) {
 		computerService.delete(Long.parseLong(request.getParameter("id")));
-		ValidationMessage validation = new ValidationMessage.Builder().valid(true).message("Computer successfully deleted").build();
-		redirectAttributes.addFlashAttribute("message",validation);
-		return "redirect:DisplayComputers";
+		ValidationMessage validation = new ValidationMessage.Builder()
+				.valid(true).message("Computer successfully deleted").build();
+		redirectAttributes.addFlashAttribute("message", validation);
+		return "redirect:displaycomputers";
 	}
 }

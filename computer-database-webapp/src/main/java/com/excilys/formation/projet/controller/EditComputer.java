@@ -21,50 +21,48 @@ import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.validation.ValidationMessage;
 
 @Controller
-@RequestMapping("/EditComputer")
+@RequestMapping("/editcomputer")
 public class EditComputer {
 	@Autowired
 	ComputerService computerService;
 	@Autowired
 	CompanyService companyService;
-	
+
 	@ModelAttribute("computer")
 	public Computer getLoginForm(HttpServletRequest request) {
 		return new Computer();
 	}
-	
+
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request,
-			 ModelMap model){
+	public String get(HttpServletRequest request, ModelMap model) {
 
 		List<Company> listResult = companyService.getListeCompany();
-		Computer c = computerService.getById(Long.parseLong(request.getParameter("id")));
+		Computer c = computerService.getById(Long.parseLong(request
+				.getParameter("id")));
 		model.addAttribute("computer", c);
 		model.addAttribute("companies", listResult);
-		return "editComputer";
+		return "editcomputer";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(HttpServletRequest request, 
-			@Valid @ModelAttribute("computer") Computer computer, 
-			BindingResult result,
-			RedirectAttributes redirectAttributes,
-			ModelMap model){
-		if(result.hasErrors()){
+	public String post(HttpServletRequest request,
+			@Valid @ModelAttribute("computer") Computer computer,
+			BindingResult result, RedirectAttributes redirectAttributes,
+			ModelMap model) {
+		if (result.hasErrors()) {
 			List<Company> listResult = companyService.getListeCompany();
 			model.addAttribute("companies", listResult);
 			model.addAttribute("computer", computer);
-			return "editComputer";
-		}
-		else{
-			ValidationMessage validation = new ValidationMessage.Builder().build();
+			return "editcomputer";
+		} else {
+			ValidationMessage validation = new ValidationMessage.Builder()
+					.build();
 			validation.setValid(true);
 			validation.setMessage("Computer successfully edited");
 			computerService.update(computer);
-			redirectAttributes.addFlashAttribute("message",validation);
-			return "redirect:DisplayComputers";
+			redirectAttributes.addFlashAttribute("message", validation);
+			return "redirect:displaycomputers";
 		}
 	}
-
 
 }

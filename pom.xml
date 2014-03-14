@@ -5,12 +5,11 @@
 	<groupId>formation</groupId>
 	<artifactId>computer-database</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<java-version>1.7</java-version>
-		<spring.version>4.0.1.RELEASE</spring.version>
+		<spring.version>4.0.2.RELEASE</spring.version>
 		<org.aspectj-version>1.6.10</org.aspectj-version>
-		<slf4j.version>1.6.6</slf4j.version>
 		<taglibs-standard-spec.version>1.2.1</taglibs-standard-spec.version>
 		<bonecp.version>0.8.0.RELEASE</bonecp.version>
 		<jstl.version>1.2</jstl.version>
@@ -23,10 +22,19 @@
 		<junit.version>3.8.1</junit.version>
 		<h2.version>1.3.175</h2.version>
 		<aspectj.version>1.7.3</aspectj.version>
-		<hibernate-persistence.version>4.2.10.Final</hibernate-persistence.version>
 		<spring-orm.version>3.1.1.RELEASE</spring-orm.version>
 		<usertype.jodatime.version>2.0</usertype.jodatime.version>
 		<querydsl.version>3.3.1</querydsl.version>
+		<slf4j.version>1.7.6</slf4j.version>
+		<spring-data-jpa.version>1.5.0.RELEASE</spring-data-jpa.version>
+		<binding.version>1.0.0-SNAPSHOT</binding.version>
+		<core.version>1.0.0-SNAPSHOT</core.version>
+		<service.version>1.0.0-SNAPSHOT</service.version>
+		<persistence.version>1.0.0-SNAPSHOT</persistence.version>
+		<webapp.version>1.0.0-SNAPSHOT</webapp.version>
+		<persistence-api.version>1.0.2</persistence-api.version>
+		<hibernate.version>4.3.4.Final</hibernate.version>
+		<hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -73,21 +81,7 @@
 				<version>${spring.version}</version>
 			</dependency>
 
-			<!-- Spring JDBC connector -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-
-			<!-- H2 database engine -->
-			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>${h2.version}</version>
-			</dependency>
-
-			<!-- Hibernate Validator -->
+			<!-- Validator -->
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
@@ -136,7 +130,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
-				<version>${hibernate-persistence.version}</version>
+				<version>${hibernate.version}</version>
 			</dependency>
 
 			<dependency>
@@ -170,7 +164,82 @@
 				<artifactId>querydsl-jpa</artifactId>
 				<version>${querydsl.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-jpa</artifactId>
+				<version>${spring-data-jpa.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>formation</groupId>
+				<artifactId>computer-database-core</artifactId>
+				<version>${core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>formation</groupId>
+				<artifactId>computer-database-persistence</artifactId>
+				<version>${persistence.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>formation</groupId>
+				<artifactId>computer-database-service</artifactId>
+				<version>${service.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>formation</groupId>
+				<artifactId>computer-database-binding</artifactId>
+				<version>${binding.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>formation</groupId>
+				<artifactId>computer-database-webapp</artifactId>
+				<version>${webapp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.persistence</groupId>
+				<artifactId>persistence-api</artifactId>
+				<version>${persistence-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${hibernate.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.1-api</artifactId>
+				<version>${hibernate-jpa.version}</version>
+			</dependency>
+
+
+
 		</dependencies>
+
 
 	</dependencyManagement>
 
@@ -192,6 +261,14 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
@@ -200,14 +277,6 @@
 					<compilerArgument>-Xlint:all</compilerArgument>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<configuration>
-					<mainClass>org.test.int1.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

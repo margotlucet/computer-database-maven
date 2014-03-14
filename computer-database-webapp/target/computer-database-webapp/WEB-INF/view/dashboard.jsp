@@ -15,7 +15,7 @@
 	</c:if>
 
 	<div id="actions">
-		<form action="DisplayComputers" method="GET">
+		<form action="displaycomputers" method="GET">
 			<div class="input">
 				<input type="search" id="searchbox" name="search" value=""
 					placeholder="Search name">
@@ -34,12 +34,12 @@
 				<spring:message code="label.buttonsearch" />
 			</button>
 		</form>
-		<a class="btn success" id="add" href="AddComputer"><spring:message code="label.add"/></a>
+		<a class="btn success" id="add" href="addcomputer"><spring:message code="label.add"/></a>
 	</div>
 
 	<div class="pagination">
 		<h:page totalElements="${pageResult.resultCount}"
-			actionPrefix="DisplayComputers?" pageCount="${pageResult.pageCount}"
+			actionPrefix="displaycomputers?" pageCount="${pageResult.pageCount}"
 			resultsPerPage="${pageResult.resultsPerPage}"
 			page="${pageResult.currPage}"
 			numberOfElements="${pageResult.currentResultCount}">
@@ -61,7 +61,7 @@
 		<tbody>
 			<c:forEach var="computer" items="${pageResult.elementList}">
 				<tr>
-					<td><a href="EditComputer?id=${computer.id}">${computer.name}</a></td>
+					<td><a href="editcomputer?id=${computer.id}">${computer.name}</a></td>
 					<td>${computer.introduced}</td>
 					<td>${computer.discontinued}</td>
 					<td>${computer.companyName}</td>

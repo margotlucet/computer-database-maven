@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>formation</groupId>
 		<artifactId>computer-database</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>computer-database-binding</artifactId>
 	<name>computer-database-binding</name>
@@ -24,20 +24,12 @@
 		<dependency>
 			<groupId>formation</groupId>
 			<artifactId>computer-database-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<!-- Logback core -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Logback classic -->
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
+
 	</dependencies>
 </project>

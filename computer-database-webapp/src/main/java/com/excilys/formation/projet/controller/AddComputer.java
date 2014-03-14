@@ -23,7 +23,7 @@ import com.excilys.formation.projet.service.ComputerService;
 import com.excilys.formation.projet.validation.ValidationMessage;
 
 @Controller
-@RequestMapping("/AddComputer")
+@RequestMapping("/addcomputer")
 public class AddComputer {
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(DisplayComputers.class);
@@ -45,7 +45,7 @@ public class AddComputer {
 	public String get(ModelMap model) {
 		List<Company> listResult = companyService.getListeCompany();
 		model.addAttribute("companies", listResult);
-		return "addComputer";
+		return "addcomputer";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -57,7 +57,7 @@ public class AddComputer {
 			model.addAttribute("computer", computer);
 			List<Company> listResult = companyService.getListeCompany();
 			model.addAttribute("companies", listResult);
-			return "addComputer";
+			return "addcomputer";
 		} else {
 			ValidationMessage validation = new ValidationMessage.Builder()
 					.build();
@@ -65,7 +65,7 @@ public class AddComputer {
 			validation.setMessage("Computer successfully added");
 			computerService.add(computer);
 			redirectAttributes.addFlashAttribute("message", validation);
-			return "redirect:DisplayComputers";
+			return "redirect:displaycomputers";
 		}
 	}
 }

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>formation</groupId>
 		<artifactId>computer-database</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>computer-database-service</artifactId>
 	<name>computer-database-service</name>
@@ -24,36 +24,36 @@
 		<dependency>
 			<groupId>formation</groupId>
 			<artifactId>computer-database-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>hibernate-jpa-2.1-api</artifactId>
+					<groupId>org.hibernate.javax.persistence</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>formation</groupId>
 			<artifactId>computer-database-persistence</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
-		</dependency>
-
-		<!-- Logback core -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-
-		<!-- Logback classic -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-jpa-2.1-api</artifactId>
+					<groupId>org.hibernate.javax.persistence</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
 		</dependency>
+
+
 	</dependencies>
 </project>

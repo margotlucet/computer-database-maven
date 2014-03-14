@@ -18,7 +18,7 @@ import com.excilys.formation.projet.util.Constant;
 import com.excilys.formation.projet.wrapper.PageWrapper;
 
 @Controller
-@RequestMapping("/DisplayComputers")
+@RequestMapping("/displaycomputers")
 public class DisplayComputers {
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(DisplayComputers.class);
@@ -33,6 +33,7 @@ public class DisplayComputers {
 		String page = request.getParameter("page");
 		LOGGER.debug("Param page number :" + page);
 		String resultsPerPageString = request.getParameter("resultsPerPage");
+		LOGGER.debug("Results per page : " + resultsPerPageString);
 		LOGGER.debug("Results per page : " + resultsPerPageString);
 		String search = request.getParameter("search");
 		int resultsPerPage = 10;
