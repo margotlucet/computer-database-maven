@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags"
+	prefix="sec"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,9 +17,14 @@
 <body>
 	<header class="topbar">
 		<h1 class="fill">
-			<a href="displaycomputers"> Application </a>
-			<a href="?lang=fr"><img style="border:0;" src="images/france.jpg" alt="FR"></a>  
-			<a href="?lang=de"><img style="border:0;" src="images/allemagne.jpg" alt="DE"></a> 
-			<a href="?lang=en"><img style="border:0;" src="images/angleterre.jpg" alt="EN"></a>
+			<a href="displaycomputers"> Application </a> <a href="?lang=fr"><img
+				style="border: 0;" src="images/france.jpg" alt="FR"></a> <a
+				href="?lang=de"><img style="border: 0;"
+				src="images/allemagne.jpg" alt="DE"></a> <a href="?lang=en"><img
+				style="border: 0;" src="images/angleterre.jpg" alt="EN"></a>
+			<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+				<a href="logout" id="logoutSecurity" class="btn danger" style="float:right"> Logout</a>
+			</sec:authorize>
 		</h1>
+
 	</header>

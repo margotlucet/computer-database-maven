@@ -34,7 +34,7 @@
 				<spring:message code="label.buttonsearch" />
 			</button>
 		</form>
-		<a class="btn success" id="add" href="addcomputer"><spring:message code="label.add"/></a>
+		<a class="btn success" id="add" href="addcomputer" ><spring:message code="label.add"/></a>
 	</div>
 
 	<div class="pagination">

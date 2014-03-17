@@ -11,12 +11,5 @@ import com.excilys.formation.projet.om.Company;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
 	public List<Company> findAll();
-	/*
-	 * public void delete(Company c);
-	 * 
-	 * public Company findOne(Long id);
-	 * 
-	 * public <S extends Company> S save(Company c);
-	 */
 
 }

@@ -35,6 +35,8 @@
 		<persistence-api.version>1.0.2</persistence-api.version>
 		<hibernate.version>4.3.4.Final</hibernate.version>
 		<hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
+		<spring-security.version>3.2.2.RELEASE</spring-security.version>
+		<spring-security-taglibs.version>3.2.1.RELEASE</spring-security-taglibs.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -234,6 +236,22 @@
 				<groupId>org.hibernate.javax.persistence</groupId>
 				<artifactId>hibernate-jpa-2.1-api</artifactId>
 				<version>${hibernate-jpa.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
+				<version>${spring-security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-config</artifactId>
+				<version>${spring-security.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-taglibs</artifactId>
+				<version>${spring-security-taglibs.version}</version>
 			</dependency>
 
 
