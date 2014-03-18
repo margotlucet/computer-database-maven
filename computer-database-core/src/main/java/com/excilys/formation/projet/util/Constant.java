@@ -8,9 +8,9 @@ public final class Constant {
 	public static final String OK = "OK";
 	public static final String ASC = "ASC";
 	public static final String DESC = "DESC";
-	public static final String NAME = "computer.name";
-	public static final String INTRODUCED = "computer.introduced";
-	public static final String DISCONTINUED = "computer.discontinued";
+	public static final String NAME = "name";
+	public static final String INTRODUCED = "introduced";
+	public static final String DISCONTINUED = "discontinued";
 	public static final String COMPANY = "company.name";
 
 }

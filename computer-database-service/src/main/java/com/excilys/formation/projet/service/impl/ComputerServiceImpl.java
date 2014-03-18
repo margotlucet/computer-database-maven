@@ -104,7 +104,7 @@ public class ComputerServiceImpl implements ComputerService {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		pw.setCurrPage(page);
 		pw.setResultsPerPage(nbResult);
-		PageRequest pageRequest = new PageRequest(page, nbResult,
+		PageRequest pageRequest = new PageRequest(page - 1, nbResult,
 				Sort.Direction.ASC, orderBy);
 		pw.setElementList(computerRepository.findAll(pageRequest).getContent());
 		int resultCount = (int) computerRepository.count();
@@ -126,7 +126,7 @@ public class ComputerServiceImpl implements ComputerService {
 		PageWrapper<Computer> pw = new PageWrapper<Computer>();
 		pw.setCurrPage(page);
 		pw.setResultsPerPage(nbResult);
-		PageRequest pageRequest = new PageRequest(page, nbResult,
+		PageRequest pageRequest = new PageRequest(page - 1, nbResult,
 				Sort.Direction.ASC, orderBy);
 		pw.setElementList(computerRepository.findByCompanyNameLikeOrNameLike(
 				"%" + search + "%", "%" + search + "%", pageRequest));

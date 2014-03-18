@@ -28,10 +28,8 @@
 	</security:http>
 
 	<authentication-manager>
-		<authentication-provider>
-			<user-service>
-				<user name="margot" password="123456" authorities="ROLE_USER" />
-			</user-service>
+		<authentication-provider user-service-ref="userService">
+		  <security:password-encoder hash="sha"/>
 		</authentication-provider>
 	</authentication-manager>
 
